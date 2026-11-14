@@ -1,0 +1,22 @@
+name: actor-probe
+on:
+  pull_request_target:
+    types: [opened, synchronize, reopened, ready_for_review]
+permissions:
+  contents: read
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - name: dump context
+        env:
+          A_ACTION: ${{ github.event.action }}
+          A_ACTOR: ${{ github.actor }}
+          A_TRIG: ${{ github.triggering_actor }}
+          A_PRUSER: ${{ github.event.pull_request.user.login }}
+          A_HEADREPO: ${{ github.event.pull_request.head.repo.full_name }}
+          A_BASEREPO: ${{ github.repository }}
+          A_HEADSHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          printf 'action=%s\nactor=%s\ntriggering_actor=%s\npr_user=%s\nhead_repo=%s\nbase_repo=%s\nhead_sha=%s\n' \
+            "$A_ACTION" "$A_ACTOR" "$A_TRIG" "$A_PRUSER" "$A_HEADREPO" "$A_BASEREPO" "$A_HEADSHA" | tee -a "$GITHUB_STEP_SUMMARY"
